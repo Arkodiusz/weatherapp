@@ -22,7 +22,7 @@ function hide_table() {
 function refresh() {
     hide_table();
 
-    var api_gateway_url = 'https://ikaq65a9q9.execute-api.eu-central-1.amazonaws.com/prod';
+    var api_gateway_url = 'https://8kz5g7t6if.execute-api.eu-central-1.amazonaws.com/prod/scan';
     var rows = [];
 
     $.get(api_gateway_url, function(data) {
