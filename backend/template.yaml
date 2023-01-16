@@ -57,7 +57,7 @@ Resources:
           Type: Api
           Properties:
             Path: /add/
-            Method: POST
+            Method: GET
             RestApiId:
               Ref: SamWeatherappApi
       Environment:
@@ -127,7 +127,7 @@ Resources:
                       application/json: "{\"statusCode\": 200}"
                     type: "mock"
               /add:
-                post:
+                get:
                   produces:
                     - "application/json"
                   responses:
@@ -148,6 +148,9 @@ Resources:
                         statusCode: "200"
                         responseParameters:
                           method.response.header.Access-Control-Allow-Origin: "'*'"
+                    passthroughBehavior: "when_no_templates"
+                    requestTemplates:
+                      application/json: "{\"queryParams\": {#foreach($param in $input.params().querystring.keySet())\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end#end}}"
                 options:
                   consumes:
                     - "application/json"
