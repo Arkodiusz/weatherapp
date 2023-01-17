@@ -1,4 +1,4 @@
-const API_URL = 'https://r5tlx9s6u5.execute-api.eu-central-1.amazonaws.com/prod'
+const API_URL = 'https://mqp8jx5px4.execute-api.eu-central-1.amazonaws.com/prod'
 
 const API_URL_SCAN = API_URL + '/scan'
 const API_URL_ADD = API_URL + '/add'
