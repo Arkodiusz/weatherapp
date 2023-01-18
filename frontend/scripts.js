@@ -2,6 +2,7 @@ const API_URL = 'https://mqp8jx5px4.execute-api.eu-central-1.amazonaws.com/prod'
 
 const API_URL_SCAN = API_URL + '/scan'
 const API_URL_ADD = API_URL + '/add'
+const API_URL_DELETE = API_URL + '/delete'
 
 const API_WEATHER = 'https://api.open-meteo.com/v1/forecast?&current_weather=true' // &longitude=0&latitude=0
 
@@ -54,10 +55,9 @@ function fetchTemperature() {
         success: function(data) {
             console.log('path', path)
             console.log('response', data)
-            alert('Temperature in selected place: ' + data.current_weather.temperature)
+            alert('Temperature in \'' + name + '\': ' + data.current_weather.temperature)
         }
     })
-
 }
 
 
@@ -70,19 +70,16 @@ function addItem() {
         alert('Name not provided')
         return
     }
-
     if (long < -180 || long > 180) {
         alert('Longitude out of range [-180..180] degrees')
         return
     }
-
     if (lat < -90 || lat > 90) {
         alert('Longitude out of range [-90..90] degrees')
         return
     }
 
     var path = API_URL_ADD + '?name=' + name + '&long=' + long + '&lat=' + lat
-
     $.ajax({
         async: false,
         type: 'GET',
@@ -111,15 +108,14 @@ function refresh() {
                 long = item['longitude']['N']
                 lat = item['latitude']['N']
                 temp = 0
-                var rowId = "row" + rowNumber
 
                 rows.push(
                     `<tr>
-                        <td><input type="radio" id=${rowId} name="radio_selector"></td>
+                        <td><input type="radio" id=${"selector_" + rowNumber} name="radio_selector"></td>
                         <td id="name">${name}</td>
                         <td id="long">${long}</td>
                         <td id="lat">${lat}</td>
-                        <td></td>
+                        <td><button id=${"btn_delete_" + rowNumber} onclick="deleteItem()">DELETE</button></td>
                     </tr>`)
 
                 rowNumber++
@@ -127,6 +123,27 @@ function refresh() {
         }     
     })
     draw_table(rows)
+}
+
+
+function deleteItem() {
+
+    var selectedItem = $('#' + event.target.id).closest('tr').find("td#name").text()
+    
+    console.log('item selected for deletion:', selectedItem)
+
+    var path = API_URL_DELETE + '?name=' + name
+    $.ajax({
+        async: false,
+        type: 'GET',
+        url: path,
+        success: function(data) {
+            console.log('path', path)
+            console.log('response', data)
+        }
+    })
+    
+    refresh()
 }
 
 

@@ -65,6 +65,33 @@ Resources:
           TABLE_NAME:
             Ref: SamWeatherappDb
 
+  SamWeatherappLambdaDelete:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: delete.handler
+      Runtime: nodejs16.x
+      CodeUri: 's3://weatherappsource/delete.zip'
+      Description: Delete item from DynamoDB table
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - CloudWatchPutMetricPolicy: { }
+        - DynamoDBCrudPolicy:
+            TableName:
+              Ref: SamWeatherappDb
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /delete/
+            Method: GET
+            RestApiId:
+              Ref: SamWeatherappApi
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: SamWeatherappDb
+
   SamWeatherappApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -143,6 +170,60 @@ Resources:
                     type: aws
                     uri:
                       Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SamWeatherappLambdaAdd.Arn}/invocations
+                    responses:
+                      default:
+                        statusCode: "200"
+                        responseParameters:
+                          method.response.header.Access-Control-Allow-Origin: "'*'"
+                    passthroughBehavior: "when_no_templates"
+                    requestTemplates:
+                      application/json: "{\"queryParams\": {#foreach($param in $input.params().querystring.keySet())\"$param\": \"$util.escapeJavaScript($input.params().querystring.get($param))\" #if($foreach.hasNext),#end#end}}"
+                options:
+                  consumes:
+                    - "application/json"
+                  produces:
+                    - "application/json"
+                  responses:
+                    '200':
+                      description: "200 response"
+                      schema:
+                        $ref: "#/definitions/Empty"
+                      headers:
+                        Access-Control-Allow-Origin:
+                          type: "string"
+                        Access-Control-Allow-Methods:
+                          type: "string"
+                        Access-Control-Allow-Headers:
+                          type: "string"
+                  x-amazon-apigateway-integration:
+                    responses:
+                      default:
+                        statusCode: "200"
+                        responseParameters:
+                          method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                          method.response.header.Access-Control-Allow-Origin: "'*'"
+                    passthroughBehavior: "when_no_match"
+                    requestTemplates:
+                      application/json: "{\"statusCode\": 200}"
+                    type: "mock"
+              /delete:
+                get:
+                  produces:
+                    - "application/json"
+                  responses:
+                    '200':
+                      description: "200 response"
+                      schema:
+                        $ref: "#/definitions/Empty"
+                      headers:
+                        Access-Control-Allow-Origin:
+                          type: "string"
+                  x-amazon-apigateway-integration:
+                    httpMethod: POST
+                    type: aws
+                    uri:
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SamWeatherappLambdaDelete.Arn}/invocations
                     responses:
                       default:
                         statusCode: "200"
