@@ -1,10 +1,10 @@
 const API_URL = 'https://mqp8jx5px4.execute-api.eu-central-1.amazonaws.com/prod'
 
 const API_URL_SCAN = API_URL + '/scan'
-const API_URL_ADD = API_URL + '/add'
-const API_URL_DELETE = API_URL + '/delete'
+const API_URL_ADD = API_URL + '/add' // ?name=[S]&longitude=[N]&latitude=[N]
+const API_URL_DELETE = API_URL + '/delete' // ?name=[S]
 
-const API_WEATHER = 'https://api.open-meteo.com/v1/forecast?&current_weather=true' // &longitude=0&latitude=0
+const API_WEATHER = 'https://api.open-meteo.com/v1/forecast?&current_weather=true' // &longitude=[N]&latitude=[N]
 
 const htmlHeaderRow =
 `<tr>
@@ -29,8 +29,7 @@ $(document).ready(refresh())
 
 
 function fetchTemperature() {
-
-    var checkRadio = document.querySelector('input[name="radio_selector"]:checked');
+    var checkRadio = document.querySelector('input[name="radio_selector"]:checked')
 
     if(checkRadio == null) {
         alert('No item selected!')
@@ -41,10 +40,6 @@ function fetchTemperature() {
     var name = selectedRow.find("td#name").text()
     var long = selectedRow.find("td#long").text()
     var lat = selectedRow.find("td#lat").text()
-
-    console.log('name', name)
-    console.log('long', long)
-    console.log('lat', lat)
 
     var path = API_WEATHER + '&longitude=' + long + '&latitude=' + lat
 
@@ -127,12 +122,9 @@ function refresh() {
 
 
 function deleteItem() {
-
     var selectedItem = $('#' + event.target.id).closest('tr').find("td#name").text()
-    
-    console.log('item selected for deletion:', selectedItem)
 
-    var path = API_URL_DELETE + '?name=' + name
+    var path = API_URL_DELETE + '?name=' + selectedItem
     $.ajax({
         async: false,
         type: 'GET',
@@ -148,7 +140,7 @@ function deleteItem() {
 
 
 function draw_table(rows) {
-    $('#table1').empty();
+    $('#table1').empty()
     $('#table1').append(htmlHeaderRow)
     $('#table1').append(rows.join())
     $('#table1').append(htmlFormRow)

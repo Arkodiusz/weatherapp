@@ -18,7 +18,7 @@ exports.handler = async (event) => {
         TableName: tableName
     }
 
-    let result = await dynamoDB.get(get_params).promise();
+    let result = await dynamoDB.get(get_params).promise()
 
     if (result.Item != null) {
       return response(409, 'Item already exist')
@@ -45,7 +45,7 @@ async function createItem(params){
     try {
         await dynamoDB.put(params).promise()
     } catch (err) {
-        return err;
+        return err
     }
 }
 
